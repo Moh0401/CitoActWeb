@@ -1,5 +1,7 @@
+import 'package:cito_act_web/models/tradition_model.dart';
 import 'package:cito_act_web/utils/nav_bar.dart';
 import 'package:cito_act_web/utils/nav_state.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cito_act_web/views/commentaire_page.dart';
 import 'package:cito_act_web/views/action_page.dart';
@@ -11,7 +13,15 @@ import 'package:provider/provider.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
+    // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
+    if (FirebaseAuth.instance.currentUser == null &&
+        settings.name != '/login') {
+      return MaterialPageRoute(builder: (_) => LoginPage());
+    }
+
     Widget page;
+
+    // Vérifier les routes
     switch (settings.name) {
       case '/login':
         page = LoginPage();
@@ -32,31 +42,45 @@ class RouteGenerator {
         page = CommentairePage();
         break;
       default:
-        page = LoginPage();
+        return _errorRoute("Route non définie");
     }
 
-    // Wrap each page with a Row that includes NavBar
-
-    return MaterialPageRoute(
-      builder: (_) => Scaffold(
-        body: Row(
-          children: [
-            NavBar(),
-            Expanded(
-              child: Consumer<NavState>(
-                builder: (context, navState, child) {
-                  // Mettre à jour la route sélectionnée
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    navState.setSelectedRoute(settings.name ?? '/action');
-                  });
-                  return page;
-                },
+    // Si ce n'est pas la page de connexion, ajouter la NavBar
+    if (settings.name != '/login') {
+      return MaterialPageRoute(
+        builder: (_) => Scaffold(
+          body: Row(
+            children: [
+              NavBar(), // Affichage de la barre de navigation
+              Expanded(
+                child: Consumer<NavState>(
+                  builder: (context, navState, child) {
+                    // Mettre à jour la route sélectionnée dans NavState
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      navState.setSelectedRoute(settings.name ?? '/action');
+                    });
+                    return page; // Afficher la page sélectionnée
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      settings: settings,
-    );
+        settings: settings,
+      );
+    } else {
+      // Retourner directement la page pour '/login'
+      return MaterialPageRoute(builder: (_) => page, settings: settings);
+    }
+  }
+
+  // Fonction pour afficher une page d'erreur
+  static Route<dynamic> _errorRoute(String message) {
+    return MaterialPageRoute(builder: (_) {
+      return Scaffold(
+        appBar: AppBar(title: Text("Erreur")),
+        body: Center(child: Text(message)),
+      );
+    });
   }
 }

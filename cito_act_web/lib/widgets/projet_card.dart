@@ -28,10 +28,10 @@ class ProjetCard extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundImage: projet.profilePic!=null
-                   ?NetworkImage(projet.profilePic!)
-                   :const AssetImage('assets/images/logo.png') as ImageProvider,
-                
+                  backgroundImage: projet.profilePic != null
+                      ? NetworkImage(projet.profilePic!)
+                      : const AssetImage('assets/images/logo.png')
+                          as ImageProvider,
                 ),
                 SizedBox(width: 16),
                 Expanded(
@@ -73,14 +73,19 @@ class ProjetCard extends StatelessWidget {
                 ElevatedButton(
                   onPressed: onValidate,
                   child: Text('Valider'),
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFF6887B0),
+                  ),
                 ),
                 SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: onDelete,
                   child: Text('Supprimer'),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFF6887B0),
+                  ),
                 ),
               ],
             ),

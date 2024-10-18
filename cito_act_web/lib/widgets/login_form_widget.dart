@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class LoginFormWidget extends StatelessWidget {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+class LoginFormWidget extends StatefulWidget {
+  @override
+  _LoginFormWidgetState createState() => _LoginFormWidgetState();
+}
+
+class _LoginFormWidgetState extends State<LoginFormWidget> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login(BuildContext context) async {
     String email = _emailController.text.trim();
@@ -14,14 +20,44 @@ class LoginFormWidget extends StatelessWidget {
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
 
-      // Redirection vers la page d'accueil si la connexion est réussie
-      Navigator.pushReplacementNamed(context, '/action');
+      // Vérifier le rôle de l'utilisateur dans Firestore
+      User? user = userCredential.user;
+      if (user != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .get();
+
+        if (userDoc.exists) {
+          String role = userDoc.get('role');
+          if (role == 'admin') {
+            // Redirection vers la page d'action si l'utilisateur est un admin
+            Navigator.pushReplacementNamed(context, '/action');
+          } else {
+            // Si l'utilisateur n'est pas un admin, afficher une erreur
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content:
+                      Text('Accès refusé : Vous n\'êtes pas administrateur.')),
+            );
+            await FirebaseAuth.instance
+                .signOut(); // Déconnexion de l'utilisateur
+          }
+        }
+      }
     } catch (e) {
       // Afficher une erreur si la connexion échoue
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Échec de la connexion : ${e.toString()}')),
       );
     }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 
   @override

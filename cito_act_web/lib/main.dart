@@ -9,7 +9,7 @@ import 'package:cito_act_web/utils/nav_state.dart'; // Assurez-vous que ce fichi
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  
+
   // Création d'un administrateur par défaut
   AdminService adminService = AdminService();
   await adminService.createAdminIfNotExists();
@@ -19,6 +19,7 @@ Future<void> main() async {
       create: (context) => NavState(),
       child: MyApp(),
     ),
+    
   );
 }
 
@@ -31,10 +32,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/action', // Assurez-vous que cette route existe
+      initialRoute: '/login', // Assurez-vous que cette route existe
       onGenerateRoute: (settings) {
         final route = RouteGenerator.generateRoute(settings);
-        
+
         if (route is MaterialPageRoute) {
           return MaterialPageRoute(
             settings: route.settings,
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
                 builder: (context, navState, child) {
                   // Mettre à jour la route sélectionnée
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    navState.setSelectedRoute(settings.name ?? '/action');
+                    navState.setSelectedRoute(settings.name ?? '/login');
                   });
                   return route.builder!(context);
                 },
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
             },
           );
         }
-        
+
         return route;
       },
     );
