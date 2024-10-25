@@ -13,9 +13,8 @@ import 'package:provider/provider.dart';
 
 class RouteGenerator {
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
-    if (FirebaseAuth.instance.currentUser == null &&
-        settings.name != '/login') {
+    // Vérifier si l'utilisateur est connecté
+    if (FirebaseAuth.instance.currentUser == null && settings.name != '/login') {
       return MaterialPageRoute(builder: (_) => LoginPage());
     }
 
@@ -39,7 +38,7 @@ class RouteGenerator {
         page = UtilisateurPage();
         break;
       case '/commentaires':
-        page = CommentairePage();
+        page = CommentReportedPage();
         break;
       default:
         return _errorRoute("Route non définie");
@@ -47,25 +46,20 @@ class RouteGenerator {
 
     // Si ce n'est pas la page de connexion, ajouter la NavBar
     if (settings.name != '/login') {
+      // On utilise le context correct pour obtenir NavState
       return MaterialPageRoute(
-        builder: (_) => Scaffold(
-          body: Row(
-            children: [
-              NavBar(), // Affichage de la barre de navigation
-              Expanded(
-                child: Consumer<NavState>(
-                  builder: (context, navState, child) {
-                    // Mettre à jour la route sélectionnée dans NavState
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      navState.setSelectedRoute(settings.name ?? '/action');
-                    });
-                    return page; // Afficher la page sélectionnée
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
+        builder: (context) {
+          // Mettre à jour la route sélectionnée dans NavState
+          Provider.of<NavState>(context, listen: false).setSelectedRoute(settings.name ?? '/action');
+          return Scaffold(
+            body: Row(
+              children: [
+                NavBar(), // Affichage de la barre de navigation
+                Expanded(child: page), // Afficher la page sélectionnée
+              ],
+            ),
+          );
+        },
         settings: settings,
       );
     } else {

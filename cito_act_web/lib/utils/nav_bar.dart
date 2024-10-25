@@ -61,39 +61,40 @@ class NavBar extends StatelessWidget {
     );
   }
 
-  Widget _buildNavItem(
-      BuildContext context, IconData icon, String label, String route) {
-    return Consumer<NavState>(
-      builder: (context, navState, child) {
-        bool isSelected = navState.selectedRoute == route;
-        return GestureDetector(
-          onTap: () {
-            navState.setSelectedRoute(route);
-            Navigator.pushNamed(context, route);
-          },
-          child: Container(
-            margin: EdgeInsets.symmetric(vertical: 5),
-            decoration: BoxDecoration(
-              color: isSelected ? Color(0xFF6887B0) : Colors.transparent,
-              borderRadius: BorderRadius.circular(10),
+ Widget _buildNavItem(
+    BuildContext context, IconData icon, String label, String route) {
+  return Consumer<NavState>(
+    builder: (context, navState, child) {
+      bool isSelected = navState.selectedRoute == route;
+      return GestureDetector(
+        onTap: () {
+          navState.setSelectedRoute(route);
+          Navigator.pushReplacementNamed(context, route); // Remplacer push par pushReplacement
+        },
+        child: Container(
+          margin: EdgeInsets.symmetric(vertical: 5),
+          decoration: BoxDecoration(
+            color: isSelected ? Color(0xFF6887B0) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: ListTile(
+            contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+            leading: Icon(
+              icon,
+              color: isSelected ? Colors.white : Color(0xFF464255),
             ),
-            child: ListTile(
-              contentPadding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-              leading: Icon(
-                icon,
+            title: Text(
+              label,
+              style: TextStyle(
                 color: isSelected ? Colors.white : Color(0xFF464255),
-              ),
-              title: Text(
-                label,
-                style: TextStyle(
-                  color: isSelected ? Colors.white : Color(0xFF464255),
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 }
