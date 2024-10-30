@@ -17,6 +17,8 @@ class ProjetModel {
   final String telephone;
   final String userId;
   final bool valider;
+  final String fcmToken; // Ajouter ce champ
+
 
   ProjetModel({
     required this.id,
@@ -33,6 +35,8 @@ class ProjetModel {
     required this.telephone,
     required this.userId,
     required this.valider,
+    required this.fcmToken,
+
   });
   factory ProjetModel.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
@@ -51,6 +55,7 @@ class ProjetModel {
       telephone: data['telephone'] ?? '',
       userId: data['userId'] ?? '',
       valider: data['valider'] ?? false,
+      fcmToken: data['fcmToken'] ?? '',
     );
   }
 
@@ -69,6 +74,7 @@ class ProjetModel {
       'telephone': telephone,
       'userId': userId,
       'valider': valider,
+      'fcmToken': fcmToken, // Ajouté ici
     };
   }
 }

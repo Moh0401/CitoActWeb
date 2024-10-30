@@ -26,6 +26,11 @@ class CommentCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              comment.text,
+              style: const TextStyle(fontSize: 14, color: Color(0xFF464255)),
+            ),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -53,11 +58,6 @@ class CommentCard extends StatelessWidget {
                   child: const Text('Supprimer'),
                 ),
               ],
-            ),
-            const SizedBox(height: 10),
-            Text(
-              comment.text,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF464255)),
             ),
           ],
         ),

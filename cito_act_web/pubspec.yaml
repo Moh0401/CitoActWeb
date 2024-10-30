@@ -99,6 +99,8 @@ dependencies:
   video_player: ^2.9.2
   url_launcher: ^6.3.1
   audioplayers: ^6.1.0
+  googleapis_auth: ^1.6.0
+  firebase_messaging: ^15.1.3
 
 dev_dependencies:
   flutter_test:
@@ -110,3 +112,5 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/your-service-account.json
+

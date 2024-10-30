@@ -17,6 +17,8 @@ class ActionModel {
   final String telephone;
   final String userId;
   final bool valider;
+    final String fcmToken; // Ajouter ce champ
+
 
   ActionModel({
     required this.id,
@@ -33,6 +35,8 @@ class ActionModel {
     required this.telephone,
     required this.userId,
     required this.valider,
+            required this.fcmToken,
+
   });
   factory ActionModel.fromFirestore(DocumentSnapshot doc) {
     Map data = doc.data() as Map<String, dynamic>;
@@ -51,6 +55,8 @@ class ActionModel {
       telephone: data['telephone'] ?? '',
       userId: data['userId'] ?? '',
       valider: data['valider'] ?? false,
+      fcmToken: data['fcmToken'] ?? '',
+
     );
   }
 
@@ -69,6 +75,8 @@ class ActionModel {
       'telephone': telephone,
       'userId': userId,
       'valider': valider,
+          'fcmToken': fcmToken, // Ajouté ici
+
     };
   }
 }

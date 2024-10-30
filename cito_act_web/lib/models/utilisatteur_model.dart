@@ -7,6 +7,7 @@ class UserModel {
   final String role;
   final String imageUrl;
 
+
   UserModel({
     required this.uid,
     required this.email,
@@ -15,6 +16,7 @@ class UserModel {
     required this.phone,
     required this.role,
     required this.imageUrl,
+
   });
 
   // Factory method pour créer un objet UserModel à partir d'un document Firestore
@@ -27,6 +29,7 @@ class UserModel {
       phone: data['phone'] ?? '',
       role: data['role'] ?? '',
       imageUrl: data['imageUrl'] ?? '',
+
     );
   }
 

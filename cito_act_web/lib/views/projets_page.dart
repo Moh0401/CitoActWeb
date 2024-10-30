@@ -25,7 +25,8 @@ class _ProjetsPageState extends State<ProjetsPage> {
 
   Future<void> signIn() async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: 'test@example.com',
         password: 'password',
       );
@@ -37,7 +38,8 @@ class _ProjetsPageState extends State<ProjetsPage> {
 
   Future<void> fetchProjets() async {
     List<ProjetModel> fetchedProjets = await _projetService.getProjets();
-    List<ProjetModel> fetchedPendingProjets = await _projetService.getPendingProjets();
+    List<ProjetModel> fetchedPendingProjets =
+        await _projetService.getPendingProjets();
     setState(() {
       projets = fetchedPendingProjets;
       totalProjets = fetchedProjets.length;
@@ -46,11 +48,23 @@ class _ProjetsPageState extends State<ProjetsPage> {
   }
 
   Future<void> validateProjet(String projetId) async {
-    await _projetService.updateProjetStatus(projetId, true);
-    fetchProjets();
+    // Trouver l'action correspondante dans la liste des actions
+    ProjetModel? projet = projets.firstWhere(
+      (a) => a.id == projetId,
+      orElse: () => throw Exception('Projet non trouvée'),
+    );
+
+    await _projetService.updateProjetStatus(projetId, true, projet.userId);
+
+    await fetchProjets(); // Rafraîchir la liste des actions
   }
 
   Future<void> deleteProjet(String projetId) async {
+    ProjetModel? projet = projets.firstWhere(
+      (a) => a.id == projetId,
+      orElse: () => throw Exception('Projet non trouvée'),
+    );
+
     await _projetService.deleteProjet(projetId);
     fetchProjets();
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:video_player/video_player.dart';
@@ -25,6 +27,9 @@ class _TraditionCardState extends State<TraditionCard> {
   late VideoPlayerController _videoPlayerController;
   final TraditionService _traditionService = TraditionService();
   bool _isFullScreen = false; // Pour gérer le mode plein écran
+  bool _isNotificationSent =
+      false; // Indicateur pour éviter les notifications multiples
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -73,8 +78,26 @@ class _TraditionCardState extends State<TraditionCard> {
 
   // Méthode pour valider la tradition
   Future<void> _validateTradition() async {
-    await _traditionService.updateTraditionStatus(widget.tradition.id, true);
-    widget.onValidate(); // Appel du callback après validation
+    // Cancel any existing timer
+    _debounceTimer?.cancel();
+
+    // Set a new timer
+    _debounceTimer = Timer(Duration(milliseconds: 300), () async {
+      if (!_isNotificationSent) {
+        _isNotificationSent = true; // Prevent multiple notifications
+
+        try {
+          await _traditionService.updateTraditionStatus(
+              widget.tradition.id, true, widget.tradition.userId);
+          widget.onValidate(); // Callback after successful validation
+        } catch (e) {
+          print('Erreur lors de la validation: $e');
+        } finally {
+          // Reset the notification flag after processing
+          _isNotificationSent = false;
+        }
+      }
+    });
   }
 
   // Méthode pour supprimer la tradition
@@ -299,7 +322,7 @@ class _TraditionCardState extends State<TraditionCard> {
               children: [
                 // Bouton Valider
                 ElevatedButton(
-                  onPressed: _validateTradition,
+                  onPressed: _isNotificationSent ? null : _validateTradition,
                   child: Text('Valider'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
@@ -307,6 +330,7 @@ class _TraditionCardState extends State<TraditionCard> {
                     foregroundColor: Colors.white, // Couleur de texte blanche
                   ),
                 ),
+
                 SizedBox(width: 8), // Espace entre les boutons
 
                 // Bouton Supprimer

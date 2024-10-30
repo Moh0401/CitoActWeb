@@ -1,5 +1,6 @@
 import 'package:cito_act_web/models/utilisatteur_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -63,6 +64,16 @@ class UserService {
     } catch (e) {
       print('Erreur lors de la récupération du nombre d\'organisations : $e');
       return 0;
+    }
+  }
+
+  Future<void> saveFcmToken(String userId) async {
+    final token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .update({'fcmToken': token});
     }
   }
 }

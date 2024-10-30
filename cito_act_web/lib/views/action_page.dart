@@ -39,6 +39,16 @@ class _ActionPageState extends State<ActionPage> {
     }
   }
 
+  /* Future<void> fetchActions() async {
+  List<ActionModel> fetchedActions = await _actionService.getActions();
+  List<ActionModel> fetchedPendingActions = await _actionService.getPendingActions();
+  setState(() {
+    actions = fetchedActions;
+    totalActions = fetchedActions.length;
+    pendingActions = fetchedPendingActions.length;
+  });
+}*/
+
   Future<void> fetchActions() async {
     List<ActionModel> fetchedActions = await _actionService.getActions();
     List<ActionModel> fetchedPendingActions =
@@ -51,11 +61,24 @@ class _ActionPageState extends State<ActionPage> {
   }
 
   Future<void> validateAction(String actionId) async {
-    await _actionService.updateActionStatus(actionId, true);
-    fetchActions();
+    // Trouver l'action correspondante dans la liste des actions
+    ActionModel? action = actions.firstWhere(
+      (a) => a.id == actionId,
+      orElse: () => throw Exception('Action non trouvée'),
+    );
+
+    await _actionService.updateActionStatus(actionId, true, action.userId);
+
+    await fetchActions(); // Rafraîchir la liste des actions
   }
 
   Future<void> deleteAction(String actionId) async {
+    // Trouver l'action correspondante dans la liste des actions
+    ActionModel? action = actions.firstWhere(
+      (a) => a.id == actionId,
+      orElse: () => throw Exception('Action non trouvée'),
+    );
+
     await _actionService.deleteAction(actionId);
     fetchActions();
   }

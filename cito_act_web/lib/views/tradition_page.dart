@@ -10,35 +10,36 @@ class TraditionPage extends StatefulWidget {
 }
 
 class _TraditionPageState extends State<TraditionPage> {
+  final TraditionService _traditionService = TraditionService();
+
   late Future<List<TraditionModel>> _pendingTraditions;
-  late Future<List<TraditionModel>>
-      _allTraditions; // Nouvelle variable pour toutes les traditions
+  late Future<List<TraditionModel>> _allTraditions;
   int totalTraditions = 0;
   int pendingTraditions = 0;
+  bool _isValidating = false;
 
   @override
   void initState() {
     super.initState();
+    // Initialise les futures avec des listes vides pour éviter les erreurs de late initialization
+    _allTraditions = Future.value([]);
+    _pendingTraditions = Future.value([]);
     fetchTraditions(); // Appelle une méthode pour récupérer toutes les traditions
   }
 
   Future<void> fetchTraditions() async {
     try {
       // Récupère toutes les traditions
-      List<TraditionModel> allTraditions =
-          await TraditionService().getTraditions();
+      List<TraditionModel> allTraditions = await _traditionService.getTraditions();
       totalTraditions = allTraditions.length;
 
       // Récupère les traditions en attente
-      List<TraditionModel> pendingTraditionsList =
-          await TraditionService().getPendingTraditions();
+      List<TraditionModel> pendingTraditionsList = await _traditionService.getPendingTraditions();
       pendingTraditions = pendingTraditionsList.length;
 
       setState(() {
-        _allTraditions =
-            Future.value(allTraditions); // Stocke toutes les traditions
-        _pendingTraditions = Future.value(
-            pendingTraditionsList); // Stocke les traditions en attente
+        _allTraditions = Future.value(allTraditions); // Stocke toutes les traditions
+        _pendingTraditions = Future.value(pendingTraditionsList); // Stocke les traditions en attente
       });
     } catch (e) {
       setState(() {
@@ -48,24 +49,30 @@ class _TraditionPageState extends State<TraditionPage> {
     }
   }
 
+ // Méthode validateTradition commentée
   Future<void> validateTradition(String traditionId) async {
-    try {
-      await TraditionService().validateTradition(traditionId);
-      fetchTraditions(); // Refresh the list after validation
-    } catch (e) {
-      print('Error validating tradition: $e');
-    }
+    // Trouver l'action correspondante dans la liste des traditions
+    TraditionModel? tradition = (await _pendingTraditions).firstWhere(
+      (t) => t.id == traditionId,
+      orElse: () => throw Exception('Tradition non trouvée'),
+    );
+
+    await _traditionService.updateTraditionStatus(traditionId, true, tradition.userId);
+    await fetchTraditions(); // Rafraîchir la liste des traditions
   }
 
+  // Méthode deleteTradition commentée
   Future<void> deleteTradition(String traditionId) async {
-    try {
-      await TraditionService().deleteTradition(traditionId);
-      fetchTraditions(); // Refresh the list after deletion
-    } catch (e) {
-      print('Error deleting tradition: $e');
-    }
+    TraditionModel? tradition = (await _pendingTraditions).firstWhere(
+      (t) => t.id == traditionId,
+      orElse: () => throw Exception('Tradition non trouvée'),
+    );
+
+    await _traditionService.deleteTradition(traditionId);
+    await fetchTraditions(); // Rafraîchir la liste des traditions
   }
 
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -116,8 +123,7 @@ class _TraditionPageState extends State<TraditionPage> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Erreur: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(
-                      child: Text('Aucune tradition en attente trouvée'));
+                  return Center(child: Text('Aucune tradition en attente trouvée'));
                 } else {
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(horizontal: 40),

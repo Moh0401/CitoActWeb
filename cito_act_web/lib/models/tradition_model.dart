@@ -16,6 +16,8 @@ class TraditionModel {
   final bool valider;
   final String description; // Champ ajouté
   final String imageUrl; // Champ ajouté
+  final String fcmToken; // Ajouter ce champ
+
 
   TraditionModel({
     required this.id,
@@ -33,6 +35,8 @@ class TraditionModel {
     required this.valider,
     required this.description, // Champ ajouté
     required this.imageUrl, // Champ ajouté
+    required this.fcmToken,
+
   });
 
   // Factory method pour créer une instance de TraditionModel à partir de Firestore
@@ -55,6 +59,8 @@ class TraditionModel {
       valider: data['valider'] ?? false,
       description: data['description'] ?? '', // Champs description ajouté
       imageUrl: data['imageUrl'] ?? '', // Champs imageUrl ajouté
+      fcmToken: data['fcmToken'] ?? '',
+
     );
   }
 
@@ -75,6 +81,7 @@ class TraditionModel {
       'valider': valider,
       'description': description, // Ajout de la description
       'imageUrl': imageUrl, // Ajout de l'image URL
+      'fcmToken': fcmToken, // Ajouté ici
     };
   }
 }
